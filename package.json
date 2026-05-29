@@ -1,0 +1,16 @@
+{
+  "name": "j-entends-rien",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web",
+    "apps/renderer",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "dev:api": "uvicorn app.main:app --reload --app-dir apps/api",
+    "lint": "npm run lint -w apps/web",
+    "typecheck": "npm run typecheck -w apps/web"
+  }
+}
