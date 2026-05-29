@@ -1,0 +1,17 @@
+{
+  "name": "@j-entends-rien/renderer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@remotion/cli": "^4.0.236",
+    "@remotion/renderer": "^4.0.236",
+    "remotion": "^4.0.236",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.171.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
