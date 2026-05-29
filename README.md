@@ -1,4 +1,4 @@
-# j-entends-rien
+# J'entends Rien
 
 MVP monorepo for turning user-uploaded music into realtime browser visuals. YouTube links are used only for metadata preview. The app does not download YouTube audio.
 
