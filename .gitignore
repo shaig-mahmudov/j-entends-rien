@@ -1,0 +1,14 @@
+node_modules
+.next
+dist
+build
+.env
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+storage
+uploads
+*.mp4
+*.wav
+*.mp3
