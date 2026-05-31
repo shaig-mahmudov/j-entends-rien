@@ -17,12 +17,22 @@ export type AudioSection = {
   intensity: number;
 };
 
+export type ReactiveFeaturePoint = {
+  time: number;
+  kick: number;
+  snare: number;
+  hihat: number;
+  vocal: number;
+  drums: number;
+};
+
 export type AudioAnalysis = {
   bpm: number;
   duration: number;
   beats: number[];
   energyCurve: EnergyPoint[];
   frequencyBands: FrequencyBandPoint[];
+  reactiveFeatures?: ReactiveFeaturePoint[];
   sections: AudioSection[];
   source?: "uploaded_audio" | "estimated_from_metadata";
 };
