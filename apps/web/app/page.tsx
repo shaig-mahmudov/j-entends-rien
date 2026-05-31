@@ -49,7 +49,7 @@ export default function LandingPage() {
           <div className="glass-panel grid gap-4 rounded-lg p-5 shadow-violet">
             <YouTubeInput onSubmit={handleCreate} busy={busy} />
             {error ? <p className="rounded-md border border-roseGlow/30 bg-roseGlow/10 px-3 py-2 text-sm text-rose-100">{error}</p> : null}
-            <p className="text-xs text-white/44">YouTube is used only for metadata preview. Upload audio manually on the next step.</p>
+            <p className="text-xs text-white/44">Paste YouTube or Spotify to start immediately. Upload audio later only if you want tighter sync.</p>
           </div>
 
           <Button variant="ghost" className="w-fit px-0 text-white/72" onClick={() => router.push("/create")} icon={<ArrowRight className="h-4 w-4" />}>
