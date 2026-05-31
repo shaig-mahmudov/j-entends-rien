@@ -67,6 +67,9 @@ Use this if you do not want to install or run Postgres yet.
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
+DATABASE_URL=
+DB_FALLBACK_TO_SQLITE=true
+SQLITE_FALLBACK_DATABASE_URL=sqlite:///./storage/j_entends_rien.db
 REDIS_URL=redis://localhost:6379/0
 STORAGE_ROOT=./storage
 
@@ -77,10 +80,11 @@ S3_BUCKET=
 
 OPENAI_API_KEY=
 GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash
 AI_PROVIDER=local
 ```
 
-Do not set `DATABASE_URL`. The backend will use local SQLite at `./storage/j_entends_rien.db`.
+Leave `DATABASE_URL` empty for SQLite. The backend will use local SQLite at `./storage/j_entends_rien.db`.
 
 2. Install dependencies:
 
@@ -93,7 +97,7 @@ npm install
 3. Run the backend:
 
 ```bash
-.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir apps/api --reload
+.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir apps/api --reload --env-file .env
 ```
 
 4. Run the frontend:
@@ -120,6 +124,8 @@ Use this if you want the local environment to match the intended production-styl
 NEXT_PUBLIC_API_URL=http://localhost:8000
 
 DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/j_entends_rien
+DB_FALLBACK_TO_SQLITE=true
+SQLITE_FALLBACK_DATABASE_URL=sqlite:///./storage/j_entends_rien.db
 REDIS_URL=redis://localhost:6379/0
 STORAGE_ROOT=./storage
 
@@ -130,6 +136,7 @@ S3_BUCKET=
 
 OPENAI_API_KEY=
 GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash
 AI_PROVIDER=local
 ```
 
@@ -150,7 +157,7 @@ npm install
 5. Run the backend:
 
 ```bash
-.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir apps/api --reload
+.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir apps/api --reload --env-file .env
 ```
 
 6. Run the frontend:
@@ -171,6 +178,8 @@ http://localhost:3000
 | --- | --- | --- |
 | `NEXT_PUBLIC_API_URL` | Yes | Public URL used by the frontend to call the FastAPI backend. |
 | `DATABASE_URL` | Optional | Database connection string. If omitted, the backend uses SQLite for local MVP development. |
+| `DB_FALLBACK_TO_SQLITE` | No | When `true`, local development falls back to SQLite if Postgres is configured but unavailable. |
+| `SQLITE_FALLBACK_DATABASE_URL` | No | SQLite database URL used by the fallback path. |
 | `REDIS_URL` | Optional for current MVP | Redis connection string for future queue workers. |
 | `STORAGE_ROOT` | Yes | Local folder where uploaded audio files and generated artifacts are stored. |
 | `S3_ENDPOINT_URL` | No | S3-compatible storage endpoint for future R2/S3 uploads. |
@@ -178,8 +187,9 @@ http://localhost:3000
 | `S3_SECRET_ACCESS_KEY` | No | S3/R2 secret key for future cloud storage. |
 | `S3_BUCKET` | No | Target S3/R2 bucket name. |
 | `OPENAI_API_KEY` | No | Reserved for a future OpenAI-powered visual director. |
-| `GEMINI_API_KEY` | No | Reserved for a future Gemini-powered visual director. |
-| `AI_PROVIDER` | No | Planned provider selector. Current MVP uses `local` deterministic JSON generation. |
+| `GEMINI_API_KEY` | Required only when `AI_PROVIDER=gemini` | Google AI Studio API key used by the backend visual director. Never expose it in frontend env vars. |
+| `GEMINI_MODEL` | No | Gemini model name. Defaults to `gemini-3.5-flash`. |
+| `AI_PROVIDER` | No | Use `local` for deterministic JSON or `gemini` to call Gemini for visual direction. |
 
 ## API Overview
 
@@ -211,7 +221,7 @@ http://localhost:3000
 
 ## AI Visual Direction
 
-The MVP does not call an external AI provider by default. Instead, the backend generates deterministic structured JSON from:
+The backend can generate visual direction in two modes. By default, `AI_PROVIDER=local` generates deterministic structured JSON from:
 
 - project title
 - source platform metadata
@@ -219,7 +229,15 @@ The MVP does not call an external AI provider by default. Instead, the backend g
 - optional lyrics
 - selected style preference
 
-The output is designed to match the future AI contract, so OpenAI or Gemini can be added later without changing the frontend visual engine.
+For Gemini development/testing, set:
+
+```env
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your_google_ai_studio_key
+GEMINI_MODEL=gemini-3.5-flash
+```
+
+Gemini still returns only structured JSON. It does not generate video directly; the Three.js visual engine renders the returned direction. If Gemini is unavailable or the key is missing, the backend falls back to the local deterministic visual director.
 
 ## Current Limitations
 
