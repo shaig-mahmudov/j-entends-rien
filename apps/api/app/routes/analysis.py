@@ -25,6 +25,7 @@ def analyze_project(project_id: str, db: Session = Depends(get_db)) -> dict:
     db.commit()
 
     analysis = analyze_audio_file(audio.storage_url)
+    analysis["source"] = "uploaded_audio"
     audio.analysis_json = analysis
     audio.duration = analysis.get("duration")
     audio.bpm = analysis.get("bpm")
