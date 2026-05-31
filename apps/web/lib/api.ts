@@ -46,6 +46,13 @@ export async function analyzeProject(projectId: string) {
   });
 }
 
+export async function createInstantVisual(
+  projectId: string,
+  payload: { lyrics?: string; stylePreference?: string }
+): Promise<{ jobId: string; status: string; audioAnalysis: Project["audioAnalysis"]; visualConfig: VisualConfig }> {
+  return request(`/projects/${projectId}/instant-visual`, { method: "POST", body: JSON.stringify(payload) });
+}
+
 export async function generateVisualConfig(
   projectId: string,
   payload: { lyrics?: string; stylePreference?: string }
