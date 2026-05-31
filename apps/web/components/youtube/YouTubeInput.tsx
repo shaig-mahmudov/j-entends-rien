@@ -23,7 +23,7 @@ export function YouTubeInput({ initialUrl = "", onSubmit, busy }: Props) {
         onSubmit({ youtubeUrl: url.trim(), youtubeTitle: preview.title, youtubeThumbnailUrl: preview.thumbnail });
       }}
     >
-      <label className="text-xs font-semibold uppercase text-white/50">YouTube URL</label>
+      <label className="text-xs font-semibold uppercase text-white/50">Music link</label>
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/38" />
@@ -31,7 +31,7 @@ export function YouTubeInput({ initialUrl = "", onSubmit, busy }: Props) {
             className="focus-ring min-h-12 w-full rounded-md border border-white/12 bg-black/34 px-10 text-sm text-white placeholder:text-white/34"
             value={url}
             onChange={(event) => setUrl(event.target.value)}
-            placeholder="https://www.youtube.com/watch?v=..."
+            placeholder="YouTube or Spotify link"
           />
         </div>
         <Button type="submit" disabled={busy || !url.trim()} icon={<Sparkles className="h-4 w-4" />}>
@@ -43,11 +43,20 @@ export function YouTubeInput({ initialUrl = "", onSubmit, busy }: Props) {
 }
 
 function buildPreview(url: string) {
+  const spotify = isSpotify(url);
   const id = extractVideoId(url);
   return {
-    title: id ? "YouTube metadata preview" : null,
+    title: spotify ? "Spotify metadata preview" : id ? "YouTube metadata preview" : null,
     thumbnail: id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null
   };
+}
+
+function isSpotify(url: string): boolean {
+  try {
+    return new URL(url).hostname.includes("open.spotify.com");
+  } catch {
+    return false;
+  }
 }
 
 function extractVideoId(url: string): string | null {
