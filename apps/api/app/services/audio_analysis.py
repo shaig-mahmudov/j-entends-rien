@@ -92,12 +92,33 @@ def _analyze_with_librosa(path: str) -> dict:
         for time, b, m, tr in zip(times[::band_stride], bass, mid, treble, strict=False)
     ]
 
+    onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
+    onset_values = _normalize([float(v) for v in onset_env[::band_stride]])
+    reactive_features = []
+    for time, onset, band in zip(times[::band_stride], onset_values, frequency_bands, strict=False):
+        kick = min(1.0, onset * (0.55 + band["bass"] * 0.7))
+        snare = min(1.0, onset * (0.35 + band["mid"] * 0.7))
+        hihat = min(1.0, onset * (0.25 + band["treble"] * 0.85))
+        vocal = min(1.0, band["mid"] * 0.82 + band["treble"] * 0.18)
+        drums = min(1.0, max(kick, snare) * 0.85 + hihat * 0.25)
+        reactive_features.append(
+            {
+                "time": round(float(time), 2),
+                "kick": round(kick, 4),
+                "snare": round(snare, 4),
+                "hihat": round(hihat, 4),
+                "vocal": round(vocal, 4),
+                "drums": round(drums, 4),
+            }
+        )
+
     return {
         "bpm": round(bpm, 2),
         "duration": round(duration, 2),
         "beats": beats[:1000],
         "energyCurve": energy,
         "frequencyBands": frequency_bands,
+        "reactiveFeatures": reactive_features,
         "sections": _build_sections(duration, energy),
     }
 
@@ -129,11 +150,23 @@ def _analyze_wav_fallback(path: str) -> dict:
     beat_gap = 60.0 / bpm
     beats = [round(index * beat_gap, 3) for index in range(int(duration / beat_gap))]
     frequency = [{"time": p["time"], "bass": p["value"], "mid": round(p["value"] * 0.7, 4), "treble": round(p["value"] * 0.45, 4)} for p in energy]
+    reactive_features = [
+        {
+            "time": p["time"],
+            "kick": p["value"],
+            "snare": round(p["value"] * 0.7, 4),
+            "hihat": round(p["value"] * 0.45, 4),
+            "vocal": round(p["value"] * 0.55, 4),
+            "drums": p["value"],
+        }
+        for p in energy
+    ]
     return {
         "bpm": bpm,
         "duration": round(duration, 2),
         "beats": beats,
         "energyCurve": energy,
         "frequencyBands": frequency,
+        "reactiveFeatures": reactive_features,
         "sections": _build_sections(duration, energy),
     }
