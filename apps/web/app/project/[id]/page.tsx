@@ -4,6 +4,7 @@ import { Download, Loader2, Save, SlidersHorizontal } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AudioPlayer } from "@/components/player/AudioPlayer";
+import { LinkedPlayback } from "@/components/player/LinkedPlayback";
 import { Button } from "@/components/ui/Button";
 import { VisualizerCanvas } from "@/components/visualizer/VisualizerCanvas";
 import { absoluteApiUrl, getProject, saveProject, startRender } from "@/lib/api";
@@ -66,7 +67,7 @@ export default function ProjectPage() {
         </header>
 
         <VisualizerCanvas />
-        <AudioPlayer src={audioUrl} />
+        {audioUrl ? <AudioPlayer src={audioUrl} /> : <LinkedPlayback project={project} />}
       </section>
 
       <aside className="grid h-fit gap-4">
@@ -95,7 +96,7 @@ export default function ProjectPage() {
           <div className="grid grid-cols-3 gap-2 text-center">
             <Metric label="BPM" value={project?.audioAnalysis?.bpm ?? "Demo"} />
             <Metric label="Beats" value={project?.audioAnalysis?.beats?.length ?? "Demo"} />
-            <Metric label="Status" value={project?.status ?? "loading"} />
+            <Metric label="Source" value={project?.audioAnalysis?.source === "estimated_from_metadata" ? "Estimated" : project?.status ?? "loading"} />
           </div>
         </div>
 
