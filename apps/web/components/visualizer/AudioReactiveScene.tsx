@@ -19,6 +19,7 @@ export function AudioReactiveScene({ preset, analysis, config, time }: Props) {
   const realtimeBands = useAppStore((state) => state.realtimeBands);
   const curve = sampleCurve(analysis.energyCurve, time);
   const bands = sampleCurve(analysis.frequencyBands, time);
+  const sampledFeatures = sampleCurve(analysis.reactiveFeatures, time);
   const beatDistance = Math.min(...analysis.beats.map((beat) => Math.abs(beat - time)).slice(0, 1000), 1);
   const beatPulse = Math.max(0, 1 - beatDistance * 8);
   const energy = Math.max(curve?.value ?? 0.25, realtimeBands.bass * 0.8);
@@ -27,7 +28,14 @@ export function AudioReactiveScene({ preset, analysis, config, time }: Props) {
     mid: Math.max(bands?.mid ?? 0, realtimeBands.mid),
     treble: Math.max(bands?.treble ?? 0, realtimeBands.treble)
   };
-  const common = { time, energy, beatPulse, bands: reactiveBands, config };
+  const features = {
+    kick: Math.max(sampledFeatures?.kick ?? 0, beatPulse * reactiveBands.bass),
+    snare: Math.max(sampledFeatures?.snare ?? 0, beatPulse * reactiveBands.mid * 0.85),
+    hihat: Math.max(sampledFeatures?.hihat ?? 0, beatPulse * reactiveBands.treble * 0.7),
+    vocal: Math.max(sampledFeatures?.vocal ?? 0, reactiveBands.mid * 0.9),
+    drums: Math.max(sampledFeatures?.drums ?? 0, beatPulse)
+  };
+  const common = { time, energy, beatPulse, bands: reactiveBands, features, config };
 
   if (preset === "neon_tunnel") return <NeonTunnel {...common} />;
   if (preset === "waveform_landscape") return <WaveformLandscape {...common} />;
