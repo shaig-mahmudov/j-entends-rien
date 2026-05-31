@@ -24,4 +24,5 @@ export type AudioAnalysis = {
   energyCurve: EnergyPoint[];
   frequencyBands: FrequencyBandPoint[];
   sections: AudioSection[];
+  source?: "uploaded_audio" | "estimated_from_metadata";
 };
