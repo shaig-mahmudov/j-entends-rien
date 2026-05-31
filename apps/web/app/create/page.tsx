@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { AudioUploader } from "@/components/upload/AudioUploader";
 import { YouTubeInput } from "@/components/youtube/YouTubeInput";
 import { YouTubePreviewCard } from "@/components/youtube/YouTubePreviewCard";
-import { absoluteApiUrl, analyzeProject, createProject, generateVisualConfig, getProject, uploadAudio } from "@/lib/api";
+import { absoluteApiUrl, analyzeProject, createInstantVisual, createProject, generateVisualConfig, getProject, uploadAudio } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 
 const styles = ["dark neon dreamy", "warm cinematic glow", "aggressive red strobe", "organic emerald haze"];
@@ -42,7 +42,8 @@ function CreatePageContent() {
       .catch(() => undefined);
   }, [existingProjectId, setAudioUrl, setProject]);
 
-  const canRun = useMemo(() => Boolean(projectId && file), [projectId, file]);
+  const canRunUpload = useMemo(() => Boolean(projectId && file), [projectId, file]);
+  const canRunInstant = useMemo(() => Boolean(projectId), [projectId]);
 
   async function handleCreate(preview: { youtubeUrl: string; youtubeTitle?: string | null; youtubeThumbnailUrl?: string | null }) {
     setBusy(true);
@@ -80,6 +81,24 @@ function CreatePageContent() {
     }
   }
 
+  async function runInstantVisual() {
+    if (!projectId) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const instant = await createInstantVisual(projectId, { lyrics, stylePreference });
+      if (instant.audioAnalysis) setAnalysis(instant.audioAnalysis);
+      setVisualConfig(instant.visualConfig);
+      const loaded = await getProject(projectId);
+      setProject(loaded);
+      router.push(`/project/${projectId}`);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Instant visual generation failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <main className="mx-auto grid min-h-screen max-w-7xl gap-6 px-5 py-8">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -93,22 +112,22 @@ function CreatePageContent() {
       <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="grid gap-5">
           <div className="glass-panel grid gap-4 rounded-lg p-5">
-            <StepLabel done={Boolean(projectId)}>1. Paste YouTube URL</StepLabel>
+            <StepLabel done={Boolean(projectId)}>1. Paste YouTube or Spotify link</StepLabel>
             <YouTubeInput onSubmit={handleCreate} busy={busy} />
           </div>
 
           <div className="glass-panel grid gap-4 rounded-lg p-5">
-            <StepLabel done={Boolean(file)}>2. Upload audio</StepLabel>
+            <StepLabel done={Boolean(file)}>2. Optional: improve sync with audio</StepLabel>
             <AudioUploader onFile={setFile} fileName={file?.name} disabled={!projectId || busy} />
           </div>
 
           <div className="glass-panel grid gap-4 rounded-lg p-5">
-            <StepLabel done={lyrics.length > 0}>3. Lyrics and style</StepLabel>
+            <StepLabel done={Boolean(stylePreference)}>3. Visual style</StepLabel>
             <textarea
               className="focus-ring min-h-36 rounded-md border border-white/12 bg-black/34 p-4 text-sm text-white placeholder:text-white/34"
               value={lyrics}
               onChange={(event) => setLyrics(event.target.value)}
-              placeholder="[00:42.50] falling&#10;Paste plain lyrics or timestamped lyrics."
+              placeholder="Optional lyrics can wait. Add timestamped lyrics later if you want lyric-reactive cues."
             />
             <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
               {styles.map((style) => (
@@ -127,14 +146,25 @@ function CreatePageContent() {
 
           {error ? <p className="rounded-md border border-roseGlow/30 bg-roseGlow/10 px-4 py-3 text-sm text-rose-100">{error}</p> : null}
 
-          <Button
-            className="min-h-12 w-fit"
-            disabled={!canRun || busy}
-            onClick={runAnalysis}
-            icon={busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <WandSparkles className="h-4 w-4" />}
-          >
-            Start analysis
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              className="min-h-12"
+              disabled={!canRunInstant || busy}
+              onClick={runInstantVisual}
+              icon={busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <WandSparkles className="h-4 w-4" />}
+            >
+              Generate instant visuals
+            </Button>
+            <Button
+              variant="secondary"
+              className="min-h-12"
+              disabled={!canRunUpload || busy}
+              onClick={runAnalysis}
+              icon={busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <WandSparkles className="h-4 w-4" />}
+            >
+              Analyze uploaded audio
+            </Button>
+          </div>
         </div>
 
         <aside className="grid h-fit gap-5">
@@ -143,9 +173,10 @@ function CreatePageContent() {
             thumbnailUrl={project?.youtubeThumbnailUrl}
             duration={project?.youtubeDuration}
             youtubeUrl={project?.youtubeUrl}
+            provider={project?.sourceProvider}
           />
           <div className="glass-panel rounded-lg p-4 text-sm text-white/58">
-            MVP export jobs are queued as render records. Realtime preview is browser-rendered with Web Audio and Three.js.
+            Instant visuals use metadata-estimated BPM and energy. Uploading audio remains optional for more accurate sync.
           </div>
         </aside>
       </section>
