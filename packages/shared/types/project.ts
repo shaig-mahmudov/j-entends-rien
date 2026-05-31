@@ -18,6 +18,9 @@ export type Project = {
   youtubeTitle?: string | null;
   youtubeThumbnailUrl?: string | null;
   youtubeDuration?: number | null;
+  sourceProvider?: string | null;
+  externalId?: string | null;
+  audioUrl?: string | null;
   status: ProjectStatus;
   audioAnalysis?: AudioAnalysis | null;
   visualConfig?: VisualConfig | null;
