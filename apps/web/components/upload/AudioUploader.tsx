@@ -24,7 +24,7 @@ export function AudioUploader({ onFile, fileName, disabled }: Props) {
       <span className="flex flex-col items-center gap-3 text-sm text-white/62">
         <Upload className="h-6 w-6 text-cyanGlow" />
         <span className="font-semibold text-white">{fileName || "Upload an audio file"}</span>
-        <span>MP3, WAV, M4A, or FLAC. Audio is never pulled from YouTube.</span>
+        <span>Optional for tighter sync. MP3, WAV, M4A, or FLAC.</span>
       </span>
     </label>
   );
