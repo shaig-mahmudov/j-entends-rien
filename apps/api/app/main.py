@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.db.session import Base, engine
+from app.db.session import init_db
 from app.models import AudioFile, Lyric, Project, Render
 from app.routes import ai, analysis, projects, render, upload
 from app.services.storage import STORAGE_ROOT, ensure_storage
@@ -21,7 +21,7 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     ensure_storage()
-    Base.metadata.create_all(bind=engine)
+    init_db()
 
 
 @app.get("/health")
