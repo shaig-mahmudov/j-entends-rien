@@ -1,5 +1,6 @@
 # J'entends Rien
 
+<<<<<<< HEAD
 J'entends Rien is an MVP web app for creating realtime, audio-reactive music visuals from user-uploaded audio. Users can paste a YouTube link for metadata preview, upload their own audio file, generate an analysis of the track, and preview cinematic visuals that react to rhythm, energy, frequency bands, lyrics, and a structured visual direction JSON.
 
 Important: the app does not download or extract audio from YouTube. YouTube URLs are used only for metadata such as title and thumbnail. Audio analysis is performed only on files uploaded manually by the user.
@@ -10,6 +11,20 @@ Important: the app does not download or extract audio from YouTube. YouTube URLs
 - Shows basic YouTube metadata preview when available.
 - Accepts manual audio uploads.
 - Analyzes audio for BPM, beat timestamps, energy, and bass/mid/treble intensity.
+=======
+J'entends Rien is an MVP web app for creating realtime, music-reactive browser visuals from a YouTube or Spotify link. Users paste a music link, choose a visual style, and instantly get cinematic visuals generated from metadata-estimated BPM, energy, sections, and mood. Uploading audio is optional and is used only when the user wants tighter beat and frequency sync.
+
+Important: the app does not download, extract, or analyze audio from YouTube or Spotify. Platform links are used for metadata, official embeds, playback position where available, and estimated visual direction. Real audio analysis is performed only on files uploaded manually by the user.
+
+## What It Does
+
+- Creates a project from a YouTube or Spotify link.
+- Shows basic metadata preview when available.
+- Generates instant no-upload visuals from estimated BPM, beats, energy, frequency bands, and sections.
+- Embeds official YouTube or Spotify playback surfaces where possible.
+- Accepts optional manual audio uploads for more accurate analysis.
+- Analyzes uploaded audio for BPM, beat timestamps, energy, and bass/mid/treble intensity.
+>>>>>>> 52fde52 (Document no-upload visual generation flow)
 - Accepts optional lyrics or timestamped lyrics.
 - Generates a deterministic visual direction JSON for the MVP.
 - Renders realtime visuals in the browser with Three.js and Web Audio.
@@ -183,9 +198,16 @@ http://localhost:3000
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
+<<<<<<< HEAD
 | `POST` | `/projects` | Create a project from a YouTube metadata URL. |
 | `GET` | `/projects/{projectId}` | Fetch project state, analysis, visual config, and renders. |
 | `PATCH` | `/projects/{projectId}` | Save project state and visual config. |
+=======
+| `POST` | `/projects` | Create a project from a YouTube, Spotify, or music URL. |
+| `GET` | `/projects/{projectId}` | Fetch project state, analysis, visual config, and renders. |
+| `PATCH` | `/projects/{projectId}` | Save project state and visual config. |
+| `POST` | `/projects/{projectId}/instant-visual` | Generate estimated analysis and visual config without an audio upload. |
+>>>>>>> 52fde52 (Document no-upload visual generation flow)
 | `POST` | `/projects/{projectId}/audio` | Upload a user-provided audio file. |
 | `POST` | `/projects/{projectId}/analyze` | Analyze uploaded audio. |
 | `POST` | `/projects/{projectId}/visual-config` | Generate structured visual direction JSON. |
@@ -194,6 +216,7 @@ http://localhost:3000
 ## MVP User Flow
 
 1. Open the web app.
+<<<<<<< HEAD
 2. Paste a YouTube URL.
 3. Create a project and preview metadata.
 4. Upload an audio file manually.
@@ -202,6 +225,16 @@ http://localhost:3000
 7. Start analysis.
 8. Open the project preview page.
 9. Play the audio and view synchronized realtime visuals.
+=======
+2. Paste a YouTube or Spotify link.
+3. Create a project and preview metadata.
+4. Choose a visual style.
+5. Generate instant visuals without uploading anything.
+6. Optionally upload an audio file to improve beat/frequency sync.
+7. Optionally add lyrics later for lyric-reactive cues.
+8. Open the project preview page.
+9. Play through the official platform embed or uploaded audio player.
+>>>>>>> 52fde52 (Document no-upload visual generation flow)
 10. Switch between visual presets.
 11. Save the project.
 12. Queue a future render/export job.
@@ -211,6 +244,10 @@ http://localhost:3000
 The MVP does not call an external AI provider by default. Instead, the backend generates deterministic structured JSON from:
 
 - project title
+<<<<<<< HEAD
+=======
+- source platform metadata
+>>>>>>> 52fde52 (Document no-upload visual generation flow)
 - audio analysis
 - optional lyrics
 - selected style preference
@@ -221,6 +258,11 @@ The output is designed to match the future AI contract, so OpenAI or Gemini can 
 
 - No authentication yet.
 - No automatic YouTube audio download.
+<<<<<<< HEAD
+=======
+- Spotify account connection is not implemented yet; Spotify links currently use embed/metadata-style behavior.
+- Link-only visuals use estimated analysis, not real raw waveform analysis.
+>>>>>>> 52fde52 (Document no-upload visual generation flow)
 - No full video editor.
 - Render/export is currently a queued record, not a finished MP4.
 - Redis and Celery are scaffolded for future background jobs.
@@ -237,4 +279,8 @@ npm run typecheck -w apps/web
 
 ## License and Platform Note
 
+<<<<<<< HEAD
 This MVP is intentionally designed around user-provided audio uploads. YouTube links are metadata-only and must not be used to download, rip, or extract audio.
+=======
+This MVP is intentionally designed around platform-safe playback and optional user-provided audio uploads. YouTube and Spotify links must not be used to download, rip, extract, or analyze protected audio.
+>>>>>>> 52fde52 (Document no-upload visual generation flow)
