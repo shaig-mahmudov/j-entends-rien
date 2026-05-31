@@ -15,6 +15,14 @@ export const demoAnalysis: AudioAnalysis = {
     mid: Number((0.26 + Math.cos(index / 5) * 0.18).toFixed(3)),
     treble: Number((0.22 + Math.sin(index / 2) * 0.16).toFixed(3))
   })),
+  reactiveFeatures: Array.from({ length: 96 }, (_, index) => ({
+    time: index,
+    kick: index % 2 === 0 ? 0.95 : 0.2,
+    snare: index % 4 === 2 ? 0.8 : 0.18,
+    hihat: index % 1 === 0 ? Number((0.35 + Math.sin(index * 1.7) * 0.28).toFixed(3)) : 0.1,
+    vocal: Number((0.32 + Math.sin(index / 4) * 0.28 + (index > 24 && index < 72 ? 0.2 : 0)).toFixed(3)),
+    drums: index % 2 === 0 ? 0.9 : 0.35
+  })),
   sections: [
     { start: 0, end: 24, type: "intro", intensity: 0.32 },
     { start: 24, end: 48, type: "verse", intensity: 0.48 },
