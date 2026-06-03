@@ -33,7 +33,10 @@ export function AudioReactiveScene({ preset, analysis, config, time }: Props) {
     snare: Math.max(sampledFeatures?.snare ?? 0, beatPulse * reactiveBands.mid * 0.85),
     hihat: Math.max(sampledFeatures?.hihat ?? 0, beatPulse * reactiveBands.treble * 0.7),
     vocal: Math.max(sampledFeatures?.vocal ?? 0, reactiveBands.mid * 0.9),
-    drums: Math.max(sampledFeatures?.drums ?? 0, beatPulse)
+    drums: Math.max(sampledFeatures?.drums ?? 0, beatPulse),
+    bassStem: Math.max(sampledFeatures?.bassStem ?? 0, reactiveBands.bass),
+    vocalStem: Math.max(sampledFeatures?.vocalStem ?? 0, sampledFeatures?.vocal ?? 0, reactiveBands.mid * 0.8),
+    otherStem: Math.max(sampledFeatures?.otherStem ?? 0, energy * 0.35)
   };
   const common = { time, energy, beatPulse, bands: reactiveBands, features, config };
 
