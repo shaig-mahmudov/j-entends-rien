@@ -72,6 +72,12 @@ DB_FALLBACK_TO_SQLITE=true
 SQLITE_FALLBACK_DATABASE_URL=sqlite:///./storage/j_entends_rien.db
 REDIS_URL=redis://localhost:6379/0
 STORAGE_ROOT=./storage
+AUDIO_ANALYSIS_MODE=studio
+STEM_SEPARATOR=auto
+DEMUCS_MODEL=htdemucs
+DEMUCS_DEVICE=cpu
+DEMUCS_TIMEOUT_SECONDS=900
+STEMS_CACHE_ROOT=./storage/stems
 
 S3_ENDPOINT_URL=
 S3_ACCESS_KEY_ID=
@@ -128,6 +134,12 @@ DB_FALLBACK_TO_SQLITE=true
 SQLITE_FALLBACK_DATABASE_URL=sqlite:///./storage/j_entends_rien.db
 REDIS_URL=redis://localhost:6379/0
 STORAGE_ROOT=./storage
+AUDIO_ANALYSIS_MODE=studio
+STEM_SEPARATOR=auto
+DEMUCS_MODEL=htdemucs
+DEMUCS_DEVICE=cpu
+DEMUCS_TIMEOUT_SECONDS=900
+STEMS_CACHE_ROOT=./storage/stems
 
 S3_ENDPOINT_URL=
 S3_ACCESS_KEY_ID=
@@ -182,6 +194,12 @@ http://localhost:3000
 | `SQLITE_FALLBACK_DATABASE_URL` | No | SQLite database URL used by the fallback path. |
 | `REDIS_URL` | Optional for current MVP | Redis connection string for future queue workers. |
 | `STORAGE_ROOT` | Yes | Local folder where uploaded audio files and generated artifacts are stored. |
+| `AUDIO_ANALYSIS_MODE` | No | Intended analysis quality mode. Use `studio` for uploaded-audio stem analysis. |
+| `STEM_SEPARATOR` | No | `auto` tries Demucs if installed, then falls back to local pseudo-stems. Use `demucs` to require Demucs or `off` to skip stems. |
+| `DEMUCS_MODEL` | No | Demucs model name. Defaults to `htdemucs`. |
+| `DEMUCS_DEVICE` | No | Optional Demucs device such as `cpu` or `cuda`. |
+| `DEMUCS_TIMEOUT_SECONDS` | No | Maximum Demucs processing time per file. |
+| `STEMS_CACHE_ROOT` | No | Folder where separated stem files are cached. |
 | `S3_ENDPOINT_URL` | No | S3-compatible storage endpoint for future R2/S3 uploads. |
 | `S3_ACCESS_KEY_ID` | No | S3/R2 access key for future cloud storage. |
 | `S3_SECRET_ACCESS_KEY` | No | S3/R2 secret key for future cloud storage. |
@@ -238,6 +256,34 @@ GEMINI_MODEL=gemini-3.5-flash
 ```
 
 Gemini still returns only structured JSON. It does not generate video directly; the Three.js visual engine renders the returned direction. If Gemini is unavailable or the key is missing, the backend falls back to the local deterministic visual director.
+
+## Studio Audio Analysis
+
+Uploaded audio can be analyzed in a stem-aware pipeline:
+
+```text
+MP3/WAV upload
+-> optional Demucs stem separation
+-> vocals / drums / bass / other analysis
+-> kick, snare, hihat, bass, vocal, beat, and downbeat events
+-> stem-aware visual timeline
+```
+
+Demucs is optional because it installs large ML dependencies. To enable real stem separation locally:
+
+```bash
+.venv\Scripts\python.exe -m pip install demucs
+```
+
+Then keep this in `.env`:
+
+```env
+STEM_SEPARATOR=auto
+DEMUCS_MODEL=htdemucs
+DEMUCS_DEVICE=cpu
+```
+
+If Demucs is unavailable, the backend still performs an enhanced fallback using harmonic/percussive separation and frequency filters. The project page shows whether the result came from `studio`, `enhanced`, or `fast` analysis.
 
 ## Current Limitations
 
