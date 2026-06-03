@@ -98,6 +98,10 @@ export default function ProjectPage() {
             <Metric label="Beats" value={project?.audioAnalysis?.beats?.length ?? "Demo"} />
             <Metric label="Source" value={project?.audioAnalysis?.source === "estimated_from_metadata" ? "Estimated" : project?.status ?? "loading"} />
           </div>
+          <div className="grid grid-cols-2 gap-2 text-center">
+            <Metric label="Quality" value={project?.audioAnalysis?.analysisQuality ?? "Demo"} />
+            <Metric label="Stems" value={project?.audioAnalysis?.stemSeparation?.status ?? "none"} />
+          </div>
         </div>
 
         <div className="glass-panel grid gap-3 rounded-lg p-4">
