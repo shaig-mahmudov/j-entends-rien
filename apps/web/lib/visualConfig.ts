@@ -21,7 +21,10 @@ export const demoAnalysis: AudioAnalysis = {
     snare: index % 4 === 2 ? 0.8 : 0.18,
     hihat: index % 1 === 0 ? Number((0.35 + Math.sin(index * 1.7) * 0.28).toFixed(3)) : 0.1,
     vocal: Number((0.32 + Math.sin(index / 4) * 0.28 + (index > 24 && index < 72 ? 0.2 : 0)).toFixed(3)),
-    drums: index % 2 === 0 ? 0.9 : 0.35
+    drums: index % 2 === 0 ? 0.9 : 0.35,
+    bassStem: Number((0.35 + Math.sin(index / 3) * 0.25 + (index > 48 ? 0.25 : 0)).toFixed(3)),
+    vocalStem: Number((0.28 + Math.sin(index / 4) * 0.3 + (index > 24 && index < 72 ? 0.28 : 0)).toFixed(3)),
+    otherStem: Number((0.22 + Math.cos(index / 7) * 0.12).toFixed(3))
   })),
   sections: [
     { start: 0, end: 24, type: "intro", intensity: 0.32 },
