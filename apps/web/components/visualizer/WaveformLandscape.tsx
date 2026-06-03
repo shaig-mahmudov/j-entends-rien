@@ -10,7 +10,7 @@ type Props = {
   energy: number;
   beatPulse: number;
   bands: { bass: number; mid: number; treble: number };
-  features: { kick: number; snare: number; hihat: number; vocal: number; drums: number };
+  features: { kick: number; snare: number; hihat: number; vocal: number; drums: number; bassStem: number; vocalStem: number; otherStem: number };
   config: VisualConfig;
 };
 
@@ -25,7 +25,7 @@ export function WaveformLandscape({ time, energy, beatPulse, bands, features, co
       group.current.rotation.x = -0.35;
       group.current.position.z = Math.sin(time * 0.35) * 0.4 - features.kick * 0.15;
     }
-    state.camera.position.set(Math.sin(time * 0.2) * 1.2 + features.snare * 0.18, 2.2 + energy * 0.8 + features.vocal * 0.25, 7 - features.kick * 0.65);
+    state.camera.position.set(Math.sin(time * 0.2) * 1.2 + features.snare * 0.18, 2.2 + energy * 0.8 + features.vocalStem * 0.28, 7 - features.kick * 0.65);
     state.camera.lookAt(0, 0, -1);
   });
 
@@ -35,7 +35,8 @@ export function WaveformLandscape({ time, energy, beatPulse, bands, features, co
         const x = (index - 36) * 0.16;
         const wave = Math.sin(index * 0.38 + time * (4 + features.drums * 2)) * 0.5 + Math.cos(index * 0.14 + time * 2) * 0.3;
         const drumLift = index % 8 === 0 ? features.kick * 0.75 : index % 8 === 4 ? features.snare * 0.55 : 0;
-        const height = 0.15 + Math.abs(wave) * (0.7 + bands.mid * 1.3) + energy * 0.5 + drumLift + features.hihat * 0.15;
+        const bassLift = Math.max(0, 1 - Math.abs(index - 36) / 36) * features.bassStem * 0.8;
+        const height = 0.15 + Math.abs(wave) * (0.7 + bands.mid * 1.3) + energy * 0.35 + drumLift + bassLift + features.hihat * 0.15;
         return (
           <mesh key={index} position={[x, height / 2 - 1.2, -Math.abs(index - 36) * 0.045]} scale={[0.075, height, 0.18 + bands.bass * 0.25]}>
             <boxGeometry args={[1, 1, 1]} />
@@ -50,11 +51,11 @@ export function WaveformLandscape({ time, energy, beatPulse, bands, features, co
       })}
       {vocalBars.map((index) => {
         const x = (index - 12) * 0.18;
-        const height = 0.1 + features.vocal * (0.5 + Math.sin(time * 5 + index * 0.5) * 0.28) + bands.mid * 0.25;
+        const height = 0.1 + features.vocalStem * (0.62 + Math.sin(time * 5 + index * 0.5) * 0.28) + bands.mid * 0.2;
         return (
           <mesh key={`vocal-${index}`} position={[x, 0.95 + height / 2, -1.45]} scale={[0.045, height, 0.045]}>
             <boxGeometry args={[1, 1, 1]} />
-            <meshBasicMaterial color={index % 2 ? "#e0f2fe" : "#8b5cf6"} transparent opacity={0.12 + features.vocal * 0.58} blending={THREE.AdditiveBlending} />
+            <meshBasicMaterial color={index % 2 ? "#e0f2fe" : "#8b5cf6"} transparent opacity={0.12 + features.vocalStem * 0.62} blending={THREE.AdditiveBlending} />
           </mesh>
         );
       })}
