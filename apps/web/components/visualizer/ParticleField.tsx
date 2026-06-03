@@ -10,7 +10,7 @@ type Props = {
   energy: number;
   beatPulse: number;
   bands: { bass: number; mid: number; treble: number };
-  features: { kick: number; snare: number; hihat: number; vocal: number; drums: number };
+  features: { kick: number; snare: number; hihat: number; vocal: number; drums: number; bassStem: number; vocalStem: number; otherStem: number };
   config: VisualConfig;
 };
 
@@ -35,16 +35,16 @@ export function ParticleField({ time, energy, beatPulse, bands, features, config
     if (points.current) {
       points.current.rotation.y = time * (0.035 + energy * 0.04);
       points.current.rotation.x = Math.sin(time * 0.18) * 0.14;
-      const scale = 1 + features.kick * 0.28 + bands.bass * 0.2;
+      const scale = 1 + features.kick * 0.28 + features.bassStem * 0.22;
       points.current.scale.setScalar(scale);
     }
     if (material.current) {
-      material.current.size = 0.02 + bands.bass * 0.1 + features.kick * 0.09 + features.hihat * 0.035;
+      material.current.size = 0.02 + features.bassStem * 0.11 + features.kick * 0.09 + features.hihat * 0.035;
       material.current.opacity = 0.42 + energy * 0.32 + features.hihat * 0.28;
       material.current.color = new THREE.Color(config.colorPalette.includes("red") ? "#fb7185" : "#22d3ee");
     }
     if (vocalRing.current) {
-      vocalRing.current.scale.setScalar(1 + features.vocal * 0.55 + Math.sin(time * 2.4) * 0.04);
+      vocalRing.current.scale.setScalar(1 + features.vocalStem * 0.75 + Math.sin(time * 2.4) * 0.04);
       vocalRing.current.rotation.z = time * 0.16;
     }
     if (kickRing.current) {
@@ -61,7 +61,7 @@ export function ParticleField({ time, energy, beatPulse, bands, features, config
       sparkGroup.current.scale.setScalar(1 + features.hihat * 0.35);
     }
     state.camera.position.z = 7 - features.kick * 0.65;
-    state.camera.position.y = 0.8 + features.vocal * 0.26;
+      state.camera.position.y = 0.8 + features.vocalStem * 0.32;
     state.camera.lookAt(0, 0, 0);
   });
 
@@ -74,8 +74,8 @@ export function ParticleField({ time, energy, beatPulse, bands, features, config
         <pointsMaterial ref={material} transparent depthWrite={false} blending={THREE.AdditiveBlending} color="#22d3ee" size={0.045} />
       </points>
       <mesh ref={vocalRing} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.65, 0.018 + features.vocal * 0.035, 12, 160]} />
-        <meshBasicMaterial color="#8b5cf6" transparent opacity={0.2 + features.vocal * 0.42} blending={THREE.AdditiveBlending} />
+        <torusGeometry args={[1.65, 0.018 + features.vocalStem * 0.035, 12, 160]} />
+        <meshBasicMaterial color="#8b5cf6" transparent opacity={0.2 + features.vocalStem * 0.42} blending={THREE.AdditiveBlending} />
       </mesh>
       <mesh ref={kickRing} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2.45, 0.028, 8, 128]} />
