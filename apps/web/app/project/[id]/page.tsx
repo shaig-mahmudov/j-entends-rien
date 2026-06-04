@@ -8,10 +8,10 @@ import { LinkedPlayback } from "@/components/player/LinkedPlayback";
 import { Button } from "@/components/ui/Button";
 import { VisualizerCanvas } from "@/components/visualizer/VisualizerCanvas";
 import { absoluteApiUrl, getProject, saveProject, startRender } from "@/lib/api";
-import { useAppStore } from "@/lib/store";
-import type { SceneType } from "@/types/visual";
+import { type PresetSelection, useAppStore } from "@/lib/store";
 
-const presets: { id: SceneType; label: string }[] = [
+const presets: { id: PresetSelection; label: string }[] = [
+  { id: "timeline", label: "Timeline" },
   { id: "particle_field", label: "Particle Field" },
   { id: "neon_tunnel", label: "Neon Tunnel" },
   { id: "waveform_landscape", label: "Waveform Landscape" }
@@ -76,7 +76,7 @@ export default function ProjectPage() {
             <SlidersHorizontal className="h-4 w-4 text-cyanGlow" />
             Visual preset
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-2">
             {presets.map((preset) => (
               <button
                 key={preset.id}

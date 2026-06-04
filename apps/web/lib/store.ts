@@ -5,6 +5,8 @@ import type { AudioAnalysis } from "@/types/audio";
 import type { Project } from "@/types/project";
 import type { SceneType, VisualConfig } from "@/types/visual";
 
+export type PresetSelection = "timeline" | SceneType;
+
 type RealtimeBands = {
   bass: number;
   mid: number;
@@ -16,13 +18,13 @@ type AppState = {
   audioUrl: string | null;
   currentTime: number;
   isPlaying: boolean;
-  selectedPreset: SceneType;
+  selectedPreset: PresetSelection;
   realtimeBands: RealtimeBands;
   setProject: (project: Project | null) => void;
   setAudioUrl: (url: string | null) => void;
   setCurrentTime: (time: number) => void;
   setIsPlaying: (playing: boolean) => void;
-  setSelectedPreset: (preset: SceneType) => void;
+  setSelectedPreset: (preset: PresetSelection) => void;
   setRealtimeBands: (bands: RealtimeBands) => void;
   setAnalysis: (analysis: AudioAnalysis) => void;
   setVisualConfig: (config: VisualConfig) => void;
@@ -33,7 +35,7 @@ export const useAppStore = create<AppState>((set) => ({
   audioUrl: null,
   currentTime: 0,
   isPlaying: false,
-  selectedPreset: "particle_field",
+  selectedPreset: "timeline",
   realtimeBands: { bass: 0, mid: 0, treble: 0 },
   setProject: (project) => set({ project }),
   setAudioUrl: (audioUrl) => set({ audioUrl }),

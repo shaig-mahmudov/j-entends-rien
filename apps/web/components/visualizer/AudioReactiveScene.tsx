@@ -1,15 +1,17 @@
 "use client";
 
+import { CinematicBackdrop } from "@/components/visualizer/CinematicBackdrop";
+import { CinematicCamera } from "@/components/visualizer/CinematicCamera";
 import { ParticleField } from "@/components/visualizer/ParticleField";
 import { NeonTunnel } from "@/components/visualizer/NeonTunnel";
 import { WaveformLandscape } from "@/components/visualizer/WaveformLandscape";
-import { sampleCurve } from "@/lib/visualConfig";
 import { useAppStore } from "@/lib/store";
+import { beatPulseAt, clamp, getSceneBlend, getSectionIntensity, resolvePalette, sampleCurve } from "@/lib/visualEngine";
 import type { AudioAnalysis } from "@/types/audio";
 import type { SceneType, VisualConfig } from "@/types/visual";
 
 type Props = {
-  preset: SceneType;
+  preset?: SceneType | "timeline";
   analysis: AudioAnalysis;
   config: VisualConfig;
   time: number;
@@ -20,9 +22,9 @@ export function AudioReactiveScene({ preset, analysis, config, time }: Props) {
   const curve = sampleCurve(analysis.energyCurve, time);
   const bands = sampleCurve(analysis.frequencyBands, time);
   const sampledFeatures = sampleCurve(analysis.reactiveFeatures, time);
-  const beatDistance = Math.min(...analysis.beats.map((beat) => Math.abs(beat - time)).slice(0, 1000), 1);
-  const beatPulse = Math.max(0, 1 - beatDistance * 8);
-  const energy = Math.max(curve?.value ?? 0.25, realtimeBands.bass * 0.8);
+  const sectionIntensity = getSectionIntensity(analysis, time);
+  const beatPulse = Math.max(beatPulseAt(analysis.beats, time), realtimeBands.bass * 0.45);
+  const energy = clamp(Math.max(curve?.value ?? 0.25, realtimeBands.bass * 0.8) * (0.82 + sectionIntensity * 0.36));
   const reactiveBands = {
     bass: Math.max(bands?.bass ?? 0, realtimeBands.bass),
     mid: Math.max(bands?.mid ?? 0, realtimeBands.mid),
@@ -38,9 +40,18 @@ export function AudioReactiveScene({ preset, analysis, config, time }: Props) {
     vocalStem: Math.max(sampledFeatures?.vocalStem ?? 0, sampledFeatures?.vocal ?? 0, reactiveBands.mid * 0.8),
     otherStem: Math.max(sampledFeatures?.otherStem ?? 0, energy * 0.35)
   };
-  const common = { time, energy, beatPulse, bands: reactiveBands, features, config };
+  const palette = resolvePalette(config);
+  const blend = getSceneBlend(config, time, preset === "timeline" ? undefined : preset);
+  const reactive = { energy, beatPulse, bands: reactiveBands, features };
+  const common = { time, ...reactive, config, palette, sceneIntensity: blend.active.intensity };
 
-  if (preset === "neon_tunnel") return <NeonTunnel {...common} />;
-  if (preset === "waveform_landscape") return <WaveformLandscape {...common} />;
-  return <ParticleField {...common} />;
+  return (
+    <>
+      <CinematicCamera time={time} blend={blend} {...reactive} />
+      <CinematicBackdrop time={time} energy={energy} beatPulse={beatPulse} palette={palette} sceneIntensity={blend.active.intensity} />
+      <ParticleField {...common} weight={blend.weights.particle_field} />
+      <WaveformLandscape {...common} weight={blend.weights.waveform_landscape} />
+      <NeonTunnel {...common} weight={blend.weights.neon_tunnel} />
+    </>
+  );
 }
